@@ -4,8 +4,11 @@ namespace DuplicationFilesExstractorApp
 {
     public partial class MainForm : Form
     {
-        public static List<string> targetExtensiions = new List<string>() { ".jpg", ".jpeg" };
+        public static List<string> TARGET_EXTENSIONS = new List<string>() { ".jpg", ".jpeg" };
 
+        /// <summary>
+        /// メインメソッド
+        /// </summary>
         public MainForm()
         {
             InitializeComponent();
@@ -50,29 +53,27 @@ namespace DuplicationFilesExstractorApp
         /// <summary>
         /// メッセージボックス表示メソッド
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="caption"></param>
+        /// <param name="caption">タイトル</param>
+        /// <param name="message">本文</param>
         private void displayMsgBox(string caption, string message)
         {
             MessageBoxButtons messageBoxButtons = MessageBoxButtons.OK;
             DialogResult msgBox = MessageBox.Show(message, caption, messageBoxButtons);
         }
 
-
+        /// <summary>
+        /// ファイル削除メソッド
+        /// 以下の条件のファイルを削除する。
+        /// ・対象拡張子ではないファイル。
+        /// ・同じディレクトリ内に同じファイル名の対象拡張子ファイルが存在しないファイル。
+        /// </summary>
+        /// <param name="targetDirPath">ユーザがメイン画面で指定したディレクトリパス</param>
         private void removeDoesNotDuplicateFile(string targetDirPath)
         {
             // 指定されたディレクトリと同じディレクトリにworkフォルダーを作成
             string[] dirPathPerDirectoryArr = targetDirPath.Split('\\');
             dirPathPerDirectoryArr[dirPathPerDirectoryArr.Length - 1] = "work";
             string workDirPath = string.Join("\\", dirPathPerDirectoryArr);
-            //foreach (string dir in dirPathPerDirectoryArr)
-            //{
-            //    workDirPath = workDirPath + dir;
-            //    if (!dir.Equals(dirPathPerDirectoryArr.Last()))
-            //    {
-            //        workDirPath = workDirPath + "\\";
-            //    }
-            //}
             int i = 1;
             while (Directory.Exists(workDirPath))
             {
@@ -93,15 +94,21 @@ namespace DuplicationFilesExstractorApp
             }
 
             // 同一ディレクトリ内で、対象拡張子ファイルと拡張子以外のファイル名が重複するファイル両方をworkフォルダーにコピー
-            copyTargetFileToWorkDir(targetDirPath, workDirPath, targetExtensiions);
+            copyTargetFileToWorkDir(targetDirPath, workDirPath, TARGET_EXTENSIONS);
 
-            //TODO: 処理の実装
-            // コピーが終わったら、元ディレクトリを削除する。
+            // ファイルのコピーが終わったら、元ディレクトリとサブディレクトリを削除する。
+            Directory.Delete(targetDirPath, true);
 
             // workフォルダーをリネームする。
-
+            Directory.Move(workDirPath, targetDirPath);
         }
 
+        /// <summary>
+        /// 削除対象でないファイルを一時フォルダーにコピーするメソッド
+        /// </summary>
+        /// <param name="targetDirPath">コピー元ディレクトリパス</param>
+        /// <param name="destinationDirPath">コピー先ディレクトリパス</param>
+        /// <param name="targetExtensions">対象拡張子リスト</param>
         private void copyTargetFileToWorkDir(string targetDirPath, string destinationDirPath, List<string> targetExtensions)
         {
             // 指定ディレクトリ配下のファイルを取得
