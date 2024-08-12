@@ -1,0 +1,16 @@
+C:\Users\hatsu\source\repos\DuplicationFilesExstractorApp\DuplicationFilesExstractorApp\bin\Debug\net8.0-windows\DuplicationFilesExstractorApp.exe
+C:\Users\hatsu\source\repos\DuplicationFilesExstractorApp\DuplicationFilesExstractorApp\bin\Debug\net8.0-windows\DuplicationFilesExstractorApp.deps.json
+C:\Users\hatsu\source\repos\DuplicationFilesExstractorApp\DuplicationFilesExstractorApp\bin\Debug\net8.0-windows\DuplicationFilesExstractorApp.runtimeconfig.json
+C:\Users\hatsu\source\repos\DuplicationFilesExstractorApp\DuplicationFilesExstractorApp\bin\Debug\net8.0-windows\DuplicationFilesExstractorApp.dll
+C:\Users\hatsu\source\repos\DuplicationFilesExstractorApp\DuplicationFilesExstractorApp\bin\Debug\net8.0-windows\DuplicationFilesExstractorApp.pdb
+C:\Users\hatsu\source\repos\DuplicationFilesExstractorApp\DuplicationFilesExstractorApp\obj\Debug\net8.0-windows\DuplicationFilesExstractorApp.MainForm.resources
+C:\Users\hatsu\source\repos\DuplicationFilesExstractorApp\DuplicationFilesExstractorApp\obj\Debug\net8.0-windows\DuplicationFilesExstractorApp.csproj.GenerateResource.cache
+C:\Users\hatsu\source\repos\DuplicationFilesExstractorApp\DuplicationFilesExstractorApp\obj\Debug\net8.0-windows\DuplicationFilesExstractorApp.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\hatsu\source\repos\DuplicationFilesExstractorApp\DuplicationFilesExstractorApp\obj\Debug\net8.0-windows\DuplicationFilesExstractorApp.AssemblyInfoInputs.cache
+C:\Users\hatsu\source\repos\DuplicationFilesExstractorApp\DuplicationFilesExstractorApp\obj\Debug\net8.0-windows\DuplicationFilesExstractorApp.AssemblyInfo.cs
+C:\Users\hatsu\source\repos\DuplicationFilesExstractorApp\DuplicationFilesExstractorApp\obj\Debug\net8.0-windows\DuplicationFilesExstractorApp.csproj.CoreCompileInputs.cache
+C:\Users\hatsu\source\repos\DuplicationFilesExstractorApp\DuplicationFilesExstractorApp\obj\Debug\net8.0-windows\DuplicationFilesExstractorApp.dll
+C:\Users\hatsu\source\repos\DuplicationFilesExstractorApp\DuplicationFilesExstractorApp\obj\Debug\net8.0-windows\refint\DuplicationFilesExstractorApp.dll
+C:\Users\hatsu\source\repos\DuplicationFilesExstractorApp\DuplicationFilesExstractorApp\obj\Debug\net8.0-windows\DuplicationFilesExstractorApp.pdb
+C:\Users\hatsu\source\repos\DuplicationFilesExstractorApp\DuplicationFilesExstractorApp\obj\Debug\net8.0-windows\DuplicationFilesExstractorApp.genruntimeconfig.cache
+C:\Users\hatsu\source\repos\DuplicationFilesExstractorApp\DuplicationFilesExstractorApp\obj\Debug\net8.0-windows\ref\DuplicationFilesExstractorApp.dll
