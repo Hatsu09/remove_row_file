@@ -8,5 +8,6 @@
 
 ## 使いかた
 1. `DuplicationFilesExstractorApp\\bin\\Debug\\net8.0-windows\\DuplicationFilesExstractorApp.exe` を実行する。
+**※.Netのダウンロードが促されることがありますので、指示にしたがってインストールしてください。**
 2. 「ファイル選択ボタン」を押下し、削除したいデータを含むディレクトリを選択
 3. 「重複ファイル名以外を削除する」ボタンを押す。
