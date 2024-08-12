@@ -11,6 +11,8 @@ https://docs.github.com/ja/repositories/working-with-files/using-files/downloadi
 
 ## 使いかた
 1. `DuplicationFilesExstractorApp\\bin\\Debug\\net8.0-windows\\DuplicationFilesExstractorApp.exe` を実行する。
-**※.Netのダウンロードが促されることがありますので、指示にしたがってインストールしてください。**
-2. 「ファイル選択ボタン」を押下し、削除したいデータを含むディレクトリを選択
-3. 「重複ファイル名以外を削除する」ボタンを押す。
+**※MicroSoft Windows Desktop Runtime - 8.x.xのダウンロードが促されることがありますので、指示にしたがってインストールしてください。**
+![スクリーンショット 2024-08-12 180340](https://github.com/user-attachments/assets/021ef926-9a38-4762-8d2a-0649101f4478)
+
+3. 「ファイル選択ボタン」を押下し、削除したいデータを含むディレクトリを選択
+4. 「重複ファイル名以外を削除する」ボタンを押す。
