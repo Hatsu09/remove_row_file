@@ -4,7 +4,10 @@
 1. 拡張子が「.jpg」または「.jpeg」のファイル(サブディレクトリも含む)
 2. 1.と同じディレクトリにjpg(jpeg)ファイルと同名のファイル(拡張子は「.jpg」または「.jpeg」ではない)
 
-抽出したファイルは、指定したディレクトリと同じディレクトリにコピーされる。
+
+## ダウンロード方法
+以下のURLを参照
+https://docs.github.com/ja/repositories/working-with-files/using-files/downloading-source-code-archives
 
 ## 使いかた
 1. `DuplicationFilesExstractorApp\\bin\\Debug\\net8.0-windows\\DuplicationFilesExstractorApp.exe` を実行する。
