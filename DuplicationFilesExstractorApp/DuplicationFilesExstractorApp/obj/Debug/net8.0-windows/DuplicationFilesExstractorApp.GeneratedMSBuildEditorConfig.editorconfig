@@ -14,6 +14,6 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = DuplicationFilesExstractorApp
-build_property.ProjectDir = C:\Users\hatsu\source\repos\DuplicationFilesExstractorApp\DuplicationFilesExstractorApp\
+build_property.ProjectDir = D:\dev\workspace\visualstudio\dev\remove_row_file\DuplicationFilesExstractorApp\DuplicationFilesExstractorApp\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 

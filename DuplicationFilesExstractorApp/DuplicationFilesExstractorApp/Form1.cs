@@ -97,9 +97,18 @@ namespace DuplicationFilesExstractorApp
             // 同一ディレクトリ内で、対象拡張子ファイルと拡張子以外のファイル名が重複するファイル両方をworkフォルダーにコピー
             copyTargetFileToWorkDir(targetDirPath, workDirPath, TARGET_EXTENSIONS);
 
+            string[] targetDirFilesList = Directory.GetFileSystemEntries(targetDirPath);
+            if (targetDirFilesList.Length == 0)
+            {
+                // 対象ファイルがない場合、ファイルの削除は行わずworkディレクトリを削除して終了
+                displayMsgBox("処理中断", "抽出対象のファイルが存在しなかったため、処理を中断します。ファイルの削除は行われません。");
+                Directory.Delete(workDirPath, true);
+                return;
+            }
+
             // ファイルのコピーが終わったら、元ディレクトリとサブディレクトリを削除する。
             //Directory.Delete(targetDirPath, true);
-            removeFolderToTrashBox(targetDirPath);
+            FileSystem.DeleteDirectory(@targetDirPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin, UICancelOption.DoNothing);
 
 
             // workフォルダーをリネームする。
@@ -174,15 +183,6 @@ namespace DuplicationFilesExstractorApp
                 Console.WriteLine("ファイルのコピーに失敗しました。");
                 Console.WriteLine(ex.ToString());
             }
-        }
-
-        /// <summary>
-        /// 指定ファイルを削除(ゴミ箱)するメソッド
-        /// </summary>
-        /// <param name="filePath"></param>
-        private void removeFolderToTrashBox(string filePath)
-        {
-            FileSystem.DeleteDirectory(@filePath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin, UICancelOption.DoNothing);
         }
     }
 }
