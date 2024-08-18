@@ -1,10 +1,11 @@
+using Microsoft.VisualBasic.FileIO;
 using System.CodeDom;
 
 namespace DuplicationFilesExstractorApp
 {
     public partial class MainForm : Form
     {
-        public static List<string> TARGET_EXTENSIONS = new List<string>() { ".jpg", ".jpeg" };
+        public static List<string> TARGET_EXTENSIONS = new List<string>() { ".jpg", ".jpeg", ".JPG", "JPEG" };
 
         /// <summary>
         /// メインメソッド
@@ -97,7 +98,9 @@ namespace DuplicationFilesExstractorApp
             copyTargetFileToWorkDir(targetDirPath, workDirPath, TARGET_EXTENSIONS);
 
             // ファイルのコピーが終わったら、元ディレクトリとサブディレクトリを削除する。
-            Directory.Delete(targetDirPath, true);
+            //Directory.Delete(targetDirPath, true);
+            removeFolderToTrashBox(targetDirPath);
+
 
             // workフォルダーをリネームする。
             Directory.Move(workDirPath, targetDirPath);
@@ -171,6 +174,15 @@ namespace DuplicationFilesExstractorApp
                 Console.WriteLine("ファイルのコピーに失敗しました。");
                 Console.WriteLine(ex.ToString());
             }
+        }
+
+        /// <summary>
+        /// 指定ファイルを削除(ゴミ箱)するメソッド
+        /// </summary>
+        /// <param name="filePath"></param>
+        private void removeFolderToTrashBox(string filePath)
+        {
+            FileSystem.DeleteDirectory(@filePath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin, UICancelOption.DoNothing);
         }
     }
 }
