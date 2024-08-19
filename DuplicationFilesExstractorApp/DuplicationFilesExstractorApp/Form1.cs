@@ -46,9 +46,20 @@ namespace DuplicationFilesExstractorApp
                 displayMsgBox("対象フォルダーが存在しません", "対象ファイルパスが存在しません");
                 return;
             }
-            removeDoesNotDuplicateFile(TargetFilePathTextBox.Text);
 
-            displayMsgBox("処理終了", "処理が終了しました。");
+            // 処理実行前確認
+            MessageBoxButtons messageBoxButtons = MessageBoxButtons.YesNo;
+            if (MessageBox.Show("ファイル名が重複していないファイルを削除してもよろしいでしょうか？", "確認", messageBoxButtons) == DialogResult.Yes)
+            {
+                removeDoesNotDuplicateFile(TargetFilePathTextBox.Text);
+
+                displayMsgBox("処理終了", "処理が終了しました。");
+                return;
+            }
+
+            displayMsgBox("処理中断", "処理実行前に中断しました。");
+            return;
+            
         }
 
         /// <summary>
@@ -107,7 +118,9 @@ namespace DuplicationFilesExstractorApp
             }
 
             // ファイルのコピーが終わったら、元ディレクトリとサブディレクトリを削除する。
-            //Directory.Delete(targetDirPath, true);
+
+            // TODO 削除ファイルのみを抽出、ゴミ箱へ移動の実装が出来たら、元ディレクトリを完全削除するようにする。
+            // Directory.Delete(targetDirPath, true);
             FileSystem.DeleteDirectory(@targetDirPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin, UICancelOption.DoNothing);
 
 
