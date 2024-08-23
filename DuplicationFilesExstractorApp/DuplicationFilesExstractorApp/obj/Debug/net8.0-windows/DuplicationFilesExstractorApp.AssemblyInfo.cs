@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DuplicationFilesExstractorApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5a256b62c3f0422eb497f6a6366567fd01e856ec")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+84471546bf22228263b7c35595dd0829b4c41354")]
 [assembly: System.Reflection.AssemblyProductAttribute("DuplicationFilesExstractorApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DuplicationFilesExstractorApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

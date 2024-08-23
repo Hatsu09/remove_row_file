@@ -5,7 +5,14 @@ namespace DuplicationFilesExstractorApp
 {
     public partial class MainForm : Form
     {
+        // 抽出対象拡張子リスト
         public static List<string> TARGET_EXTENSIONS = new List<string>() { ".jpg", ".jpeg", ".JPG", "JPEG" };
+
+        // 一時ディレクトリ名(Work)
+        public static string WORK_DIR_NAME = "work";
+
+        // 一時ディレクトリ(trash)
+        public static string TRASH_DIR_NAME = "trash";
 
         /// <summary>
         /// メインメソッド
@@ -59,7 +66,7 @@ namespace DuplicationFilesExstractorApp
 
             displayMsgBox("処理中断", "処理実行前に中断しました。");
             return;
-            
+
         }
 
         /// <summary>
@@ -82,31 +89,19 @@ namespace DuplicationFilesExstractorApp
         /// <param name="targetDirPath">ユーザがメイン画面で指定したディレクトリパス</param>
         private void removeDoesNotDuplicateFile(string targetDirPath)
         {
-            // 指定されたディレクトリと同じディレクトリにworkフォルダーを作成
+            // 指定されたディレクトリと同じディレクトリに一時ディレクトリの作成
             string[] dirPathPerDirectoryArr = targetDirPath.Split('\\');
-            dirPathPerDirectoryArr[dirPathPerDirectoryArr.Length - 1] = "work";
+            // 作業ディレクトリ(抽出対象ファイルを格納するためのディレクトリ)を作成
+            dirPathPerDirectoryArr[dirPathPerDirectoryArr.Length - 1] = WORK_DIR_NAME;
             string workDirPath = string.Join("\\", dirPathPerDirectoryArr);
-            int i = 1;
-            while (Directory.Exists(workDirPath))
-            {
-                string[] workDirPathPerBSlashArr = workDirPath.Split("\\");
-                workDirPathPerBSlashArr[workDirPathPerBSlashArr.Length - 1] = "work_" + i;
-                workDirPath = string.Join("\\", workDirPathPerBSlashArr);
-                i++;
-            }
-            try
-            {
-                Directory.CreateDirectory(workDirPath);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("workフォルダーの作成に失敗しました。");
-                Console.WriteLine(ex.ToString());
-                return;
-            }
+            makeDir(workDirPath);
+            // 作業ディレクトリ(抽出対象外ファイルを格納するためのディレクトリ)を作成
+            dirPathPerDirectoryArr[dirPathPerDirectoryArr.Length - 1] = TRASH_DIR_NAME;
+            string trashDirPath = string.Join("\\", dirPathPerDirectoryArr);
+            makeDir(trashDirPath);
 
-            // 同一ディレクトリ内で、対象拡張子ファイルと拡張子以外のファイル名が重複するファイル両方をworkフォルダーにコピー
-            copyTargetFileToWorkDir(targetDirPath, workDirPath, TARGET_EXTENSIONS);
+            // 指定ディレクトリ内のファイル抽出処理
+            copyTargetFileToWorkDir(targetDirPath, workDirPath, trashDirPath);
 
             string[] targetDirFilesList = Directory.GetFileSystemEntries(targetDirPath);
             if (targetDirFilesList.Length == 0)
@@ -117,51 +112,91 @@ namespace DuplicationFilesExstractorApp
                 return;
             }
 
-            // ファイルのコピーが終わったら、元ディレクトリとサブディレクトリを削除する。
-
-            // TODO 削除ファイルのみを抽出、ゴミ箱へ移動の実装が出来たら、元ディレクトリを完全削除するようにする。
-            // Directory.Delete(targetDirPath, true);
-            FileSystem.DeleteDirectory(@targetDirPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin, UICancelOption.DoNothing);
+            // ファイルのコピーが終わったら、元ディレクトリとサブディレクトリを完全削除する。
+            Directory.Delete(targetDirPath, true);
+            //FileSystem.DeleteDirectory(@targetDirPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin, UICancelOption.DoNothing);
 
 
             // workフォルダーをリネームする。
             Directory.Move(workDirPath, targetDirPath);
+
+            // trashフォルダーをゴミ箱へ移動。
+            FileSystem.DeleteDirectory(@trashDirPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin, UICancelOption.DoNothing);
+        }
+
+        /// <summary>
+        /// 指定したディレクトリパスを作成するメソッド
+        /// </summary>
+        /// <param name="targetDirPath">指定ディレクトリパス</param>
+        private void makeDir(string targetDirPath)
+        {
+            string[] dirPathPerBSlashArr = targetDirPath.Split("\\");
+            string dirName = dirPathPerBSlashArr[dirPathPerBSlashArr.Length - 1];
+            int i = 1;
+            while (Directory.Exists(targetDirPath))
+            {
+                // すでに同名のディレクトリが存在する場合は、ファイル名末尾に数字を入れて再度存在確認する。
+                dirPathPerBSlashArr[dirPathPerBSlashArr.Length - 1] = dirName + "_" + i;
+                targetDirPath = string.Join("\\", dirPathPerBSlashArr);
+                i++;
+            }
+            try
+            {
+                Directory.CreateDirectory(targetDirPath);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return;
+            }
         }
 
         /// <summary>
         /// 削除対象でないファイルを一時フォルダーにコピーするメソッド
         /// </summary>
         /// <param name="targetDirPath">コピー元ディレクトリパス</param>
-        /// <param name="destinationDirPath">コピー先ディレクトリパス</param>
-        /// <param name="targetExtensions">対象拡張子リスト</param>
-        private void copyTargetFileToWorkDir(string targetDirPath, string destinationDirPath, List<string> targetExtensions)
+        /// <param name="destinationDirPath">抽出対象ファイル格納ディレクトリパス</param>
+        /// <param name="trashDirPath">抽出対象外ファイル格納ディレクトリパス</param>
+        private void copyTargetFileToWorkDir(string targetDirPath, string destinationDirPath, string trashDirPath)
         {
             // 指定ディレクトリ配下のファイルを取得
             string[] targetDirFiles = Directory.GetFiles(targetDirPath);
 
             // 対象拡張子でファイルを抽出
-            List<string> targetExtensionsFileList = new List<string>();
+            List<string> targetFilesWithoutExtensions = new List<string>();
             foreach (string file in targetDirFiles)
             {
-                if (targetExtensions.Contains(Path.GetExtension(file)))
+                if (TARGET_EXTENSIONS.Contains(Path.GetExtension(file)))
                 {
-                    Console.WriteLine("target file(target extensions):" + file);
-                    targetExtensionsFileList.Add(file);
+                    targetFilesWithoutExtensions.Add(Path.GetFileNameWithoutExtension(file));
                 }
             }
 
             // ファイル名(拡張子を除く)重複が同一ディレクトリ内に存在するファイルを抽出
-            foreach (string targetExtensionsFilePath in targetExtensionsFileList)
+            foreach (string targetFile in targetDirFiles)
             {
-                foreach (string otherFilePath in targetDirFiles.Except(targetExtensionsFileList))
+                if (targetFilesWithoutExtensions.Contains(Path.GetFileNameWithoutExtension(targetFile)))
                 {
-                    if (Path.GetFileNameWithoutExtension(targetExtensionsFilePath).Equals(Path.GetFileNameWithoutExtension(otherFilePath)))
-                    {
-                        Console.WriteLine("target file(duplicate file name):" + targetExtensionsFilePath);
-                        Console.WriteLine("target file(duplicate file name):" + otherFilePath);
-                        copyTargetFile(targetExtensionsFilePath, otherFilePath, destinationDirPath);
-                    }
+                    copyTargetFile(targetFile, destinationDirPath);
+                    continue;
                 }
+                copyTargetFile(targetFile, trashDirPath);
+
+                // ファイル名(拡張子を除く)重複が同一ディレクトリ内に存在するファイルを抽出
+                //foreach (string targetExtensionsFilePath in targetFilesWithoutExtensions)
+                //{
+                //    foreach (string otherFilePath in targetDirFiles.Except(targetFilesWithoutExtensions))
+                //    {
+                //        if (Path.GetFileNameWithoutExtension(targetExtensionsFilePath).Equals(Path.GetFileNameWithoutExtension(otherFilePath)))
+                //        {
+                //            Console.WriteLine("target file(duplicate file name):" + targetExtensionsFilePath);
+                //            Console.WriteLine("target file(duplicate file name):" + otherFilePath);
+                //            copyTargetFile(targetExtensionsFilePath, otherFilePath, destinationDirPath);
+                //        }
+                //    }
+                //    // 該当しないファイルは専用ディレクトリへ移動する
+                //    File.Copy(otherFilePath, trashDirPath + "\\" + Path.GetFileName(otherFilePath));
+                //}
             }
 
             // 指定ディレクトリ配下のディレクトリを取得
@@ -169,17 +204,16 @@ namespace DuplicationFilesExstractorApp
             foreach (string dir in targetDirs)
             {
                 // ディレクトリの場合は、サブディレクトリを作成して、再帰的に処理
-                copyTargetFileToWorkDir(targetDirPath + "\\" + Path.GetFileName(dir), destinationDirPath + "\\" + Path.GetFileName(dir), targetExtensions);
+                copyTargetFileToWorkDir(targetDirPath + "\\" + Path.GetFileName(dir), destinationDirPath + "\\" + Path.GetFileName(dir), trashDirPath);
             }
         }
 
         /// <summary>
         /// 対象ファイルコピーメソッド
         /// </summary>
-        /// <param name="targetExtensionsFilePath">比較元のファイルパス(上書きあり)</param>
-        /// <param name="otherFilePath">比較対象ファイルパス(上書きなし)</param>
+        /// <param name="targetFilePath">比較元のファイルパス(上書きあり)</param>
         /// <param name="destinationDirPath">コピー先のディレクトリパス</param>
-        private void copyTargetFile(string targetExtensionsFilePath, string otherFilePath, string destinationDirPath)
+        private void copyTargetFile(string targetFilePath, string destinationDirPath)
         {
             try
             {
@@ -188,8 +222,7 @@ namespace DuplicationFilesExstractorApp
                     Directory.CreateDirectory(destinationDirPath);
                 }
                 // 同名のファイルが、ほかに2つ以上存在する場合、対象の拡張子ファイルの2回目以降のコピーはは、上書き
-                File.Copy(targetExtensionsFilePath, destinationDirPath + "\\" + Path.GetFileName(targetExtensionsFilePath), true);
-                File.Copy(otherFilePath, destinationDirPath + "\\" + Path.GetFileName(otherFilePath));
+                File.Copy(targetFilePath, destinationDirPath + "\\" + Path.GetFileName(targetFilePath));
             }
             catch (Exception ex)
             {
@@ -197,5 +230,5 @@ namespace DuplicationFilesExstractorApp
                 Console.WriteLine(ex.ToString());
             }
         }
-    }
+    } 
 }
