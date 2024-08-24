@@ -39,7 +39,7 @@
             // 
             Title.AutoSize = true;
             Title.Font = new Font("Yu Gothic UI", 15F);
-            Title.Location = new Point(15, 9);
+            Title.Location = new Point(16, 10);
             Title.Name = "Title";
             Title.Size = new Size(193, 28);
             Title.TabIndex = 0;
@@ -67,10 +67,17 @@
             // 
             // TargetFilePathTextBox
             // 
+            TargetFilePathTextBox.AccessibleDescription = "対象ディレクトリパス";
+            TargetFilePathTextBox.AllowDrop = true;
+            TargetFilePathTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            TargetFilePathTextBox.AutoCompleteMode = AutoCompleteMode.Suggest;
             TargetFilePathTextBox.Font = new Font("Yu Gothic UI", 10F);
             TargetFilePathTextBox.HideSelection = false;
             TargetFilePathTextBox.Location = new Point(15, 60);
+            TargetFilePathTextBox.MaximumSize = new Size(750, 25);
+            TargetFilePathTextBox.MinimumSize = new Size(100, 25);
             TargetFilePathTextBox.Name = "TargetFilePathTextBox";
+            TargetFilePathTextBox.ScrollBars = ScrollBars.Horizontal;
             TargetFilePathTextBox.Size = new Size(750, 25);
             TargetFilePathTextBox.TabIndex = 3;
             // 
@@ -81,6 +88,7 @@
             // 
             // MainForm
             // 
+            AllowDrop = true;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(792, 326);
@@ -90,6 +98,7 @@
             Controls.Add(Title);
             MaximizeBox = false;
             Name = "MainForm";
+            Padding = new Padding(1);
             Text = "重複ファイル名抽出AP";
             ResumeLayout(false);
             PerformLayout();

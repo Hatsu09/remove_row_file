@@ -58,9 +58,13 @@ namespace DuplicationFilesExstractorApp
             MessageBoxButtons messageBoxButtons = MessageBoxButtons.YesNo;
             if (MessageBox.Show("ファイル名が重複していないファイルを削除してもよろしいでしょうか？", "確認", messageBoxButtons) == DialogResult.Yes)
             {
-                removeDoesNotDuplicateFile(TargetFilePathTextBox.Text);
-
-                displayMsgBox("処理終了", "処理が終了しました。");
+                Dictionary<string, int> fileCntDict = removeDoesNotDuplicateFile(TargetFilePathTextBox.Text);
+                string fileCntContents = "";
+                foreach (KeyValuePair<string, int> kvp in fileCntDict)
+                {
+                    fileCntContents += "\n" + kvp.Key + "：" + kvp.Value;
+                }
+                displayMsgBox("処理終了", $"処理が終了しました。\n{fileCntContents}");
                 return;
             }
 
@@ -87,7 +91,8 @@ namespace DuplicationFilesExstractorApp
         /// ・同じディレクトリ内に同じファイル名の対象拡張子ファイルが存在しないファイル。
         /// </summary>
         /// <param name="targetDirPath">ユーザがメイン画面で指定したディレクトリパス</param>
-        private void removeDoesNotDuplicateFile(string targetDirPath)
+        /// <returns>処理ファイル件数を格納したDictonary</returns>
+        private Dictionary<string, int> removeDoesNotDuplicateFile(string targetDirPath)
         {
             // 指定されたディレクトリと同じディレクトリに一時ディレクトリの作成
             string[] dirPathPerDirectoryArr = targetDirPath.Split('\\');
@@ -103,25 +108,37 @@ namespace DuplicationFilesExstractorApp
             // 指定ディレクトリ内のファイル抽出処理
             copyTargetFileToWorkDir(targetDirPath, workDirPath, trashDirPath);
 
-            string[] targetDirFilesList = Directory.GetFileSystemEntries(targetDirPath);
-            if (targetDirFilesList.Length == 0)
+            Dictionary<string, int> fileCntDict = new Dictionary<string, int>();
+            fileCntDict.Add("抽出対象ファイル数", returnFileCntInTargetDir(workDirPath));
+            fileCntDict.Add("抽出対象外ファイル数", returnFileCntInTargetDir(trashDirPath));
+            fileCntDict.Add("全体のファイル数", returnFileCntInTargetDir(targetDirPath));
+
+            if (Directory.GetFileSystemEntries(targetDirPath).Length == 0)
             {
-                // 対象ファイルがない場合、ファイルの削除は行わずworkディレクトリを削除して終了
+                // 対象ファイルがない場合、ファイルの削除は行わず、一時ディレクトリを削除して終了
                 displayMsgBox("処理中断", "抽出対象のファイルが存在しなかったため、処理を中断します。ファイルの削除は行われません。");
                 Directory.Delete(workDirPath, true);
-                return;
+                Directory.Delete(trashDirPath, true);
+                return fileCntDict;
             }
 
-            // ファイルのコピーが終わったら、元ディレクトリとサブディレクトリを完全削除する。
-            Directory.Delete(targetDirPath, true);
-            //FileSystem.DeleteDirectory(@targetDirPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin, UICancelOption.DoNothing);
+            try
+            {
+                // trashフォルダーをゴミ箱へ移動。
+                FileSystem.DeleteDirectory(@trashDirPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin, UICancelOption.DoNothing);
 
+                // ファイルのコピーが終わったら、元ディレクトリとサブディレクトリを完全削除する。
+                Directory.Delete(targetDirPath, true);
 
-            // workフォルダーをリネームする。
-            Directory.Move(workDirPath, targetDirPath);
+                // workフォルダーをリネームする。
+                Directory.Move(workDirPath, targetDirPath);
 
-            // trashフォルダーをゴミ箱へ移動。
-            FileSystem.DeleteDirectory(@trashDirPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin, UICancelOption.DoNothing);
+            }
+            catch(Exception e) {
+                displayMsgBox("処理中断", "ファイルの削除処理に失敗しました。");
+            }
+            return fileCntDict;
+            
         }
 
         /// <summary>
@@ -181,22 +198,6 @@ namespace DuplicationFilesExstractorApp
                     continue;
                 }
                 copyTargetFile(targetFile, trashDirPath);
-
-                // ファイル名(拡張子を除く)重複が同一ディレクトリ内に存在するファイルを抽出
-                //foreach (string targetExtensionsFilePath in targetFilesWithoutExtensions)
-                //{
-                //    foreach (string otherFilePath in targetDirFiles.Except(targetFilesWithoutExtensions))
-                //    {
-                //        if (Path.GetFileNameWithoutExtension(targetExtensionsFilePath).Equals(Path.GetFileNameWithoutExtension(otherFilePath)))
-                //        {
-                //            Console.WriteLine("target file(duplicate file name):" + targetExtensionsFilePath);
-                //            Console.WriteLine("target file(duplicate file name):" + otherFilePath);
-                //            copyTargetFile(targetExtensionsFilePath, otherFilePath, destinationDirPath);
-                //        }
-                //    }
-                //    // 該当しないファイルは専用ディレクトリへ移動する
-                //    File.Copy(otherFilePath, trashDirPath + "\\" + Path.GetFileName(otherFilePath));
-                //}
             }
 
             // 指定ディレクトリ配下のディレクトリを取得
@@ -229,6 +230,22 @@ namespace DuplicationFilesExstractorApp
                 Console.WriteLine("ファイルのコピーに失敗しました。");
                 Console.WriteLine(ex.ToString());
             }
+        }
+
+        /// <summary>
+        /// 指定したディレクトリ配下のファイル数を返却する。
+        /// </summary>
+        /// <param name="targetDirPath">ディレクトリパス</param>
+        /// <returns>ディレクトリ配下のファイル数</returns>
+        private int returnFileCntInTargetDir(string targetDirPath)
+        {
+            int returnCnt = 0;
+            
+            if (Directory.Exists(targetDirPath))
+            {
+                returnCnt = Directory.GetFiles(targetDirPath, "*", System.IO.SearchOption.AllDirectories).Length;
+            }
+            return returnCnt;
         }
     } 
 }
